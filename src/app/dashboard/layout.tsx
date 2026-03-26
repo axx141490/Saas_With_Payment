@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
-import { LayoutDashboard, Settings } from "lucide-react";
+import { LayoutDashboard, Settings, Wallet } from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -18,6 +18,13 @@ export default function DashboardLayout({
           >
             <LayoutDashboard className="h-4 w-4" />
             Dashboard
+          </Link>
+          <Link
+            href="/dashboard/recharge"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+          >
+            <Wallet className="h-4 w-4" />
+            账户充值
           </Link>
           <Link
             href="/dashboard"

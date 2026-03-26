@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
 type PaymentMethod = "card" | "alipay" | "wechat_pay";
@@ -11,50 +10,70 @@ interface Props {
 }
 
 export function PaymentMethodSelector({ priceId }: Props) {
-  const [selected, setSelected] = useState<PaymentMethod>("alipay");
+  const [selected, setSelected] = useState<PaymentMethod>("card");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
+  // Note: Stripe subscriptions only support card payments
+  // Alipay and WeChat Pay only work for one-time payments
   const methods = [
-    { id: "alipay" as const, label: "支付宝", icon: "/icons/alipay.svg" },
-    {
-      id: "wechat_pay" as const,
-      label: "微信支付",
-      icon: "/icons/wechat-pay.svg",
-    },
     { id: "card" as const, label: "银行卡", icon: "/icons/card.svg" },
   ];
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (method: PaymentMethod) => {
+    console.log("Checkout clicked:", method, "PriceId:", priceId);
     setLoading(true);
+    setSelected(method);
+    setError(null);
+
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ priceId, paymentMethod: selected }),
+        body: JSON.stringify({ priceId, paymentMethod: method }),
       });
+
+      console.log("Response status:", res.status);
       const data = await res.json();
+      console.log("Response data:", data);
+
+      if (!res.ok) {
+        throw new Error(data.error || "结账失败");
+      }
+
       if (data.url) {
         window.location.href = data.url;
+      } else {
+        throw new Error("未收到支付链接");
       }
     } catch (error) {
       console.error("Checkout error:", error);
+      const errorMessage = error instanceof Error ? error.message : "支付初始化失败，请稍后重试";
+      setError(errorMessage);
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">选择支付方式</p>
-      <div className="flex gap-2">
+    <div className="space-y-3">
+      <p className="text-sm text-muted-foreground">
+        选择支付方式 <span className="text-xs">(订阅支付仅支持银行卡)</span>
+      </p>
+      <div className="flex gap-2 flex-wrap justify-center">
         {methods.map((method) => (
           <button
             key={method.id}
-            onClick={() => setSelected(method.id)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-colors text-sm ${
-              selected === method.id
-                ? "border-primary bg-primary/5"
-                : "border-border hover:border-primary/50"
+            onClick={(e) => {
+              e.preventDefault();
+              handleCheckout(method.id);
+            }}
+            disabled={loading}
+            className={`flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
+              selected === method.id && loading
+                ? "border-primary bg-primary/10 animate-pulse"
+                : "border-border hover:border-primary hover:bg-primary/5"
             }`}
           >
             <Image
@@ -67,9 +86,16 @@ export function PaymentMethodSelector({ priceId }: Props) {
           </button>
         ))}
       </div>
-      <Button onClick={handleCheckout} disabled={loading} className="w-full">
-        {loading ? "跳转支付中..." : "立即订阅"}
-      </Button>
+      {loading && (
+        <p className="text-sm text-center text-muted-foreground">
+          跳转支付中...
+        </p>
+      )}
+      {error && (
+        <p className="text-sm text-center text-destructive">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

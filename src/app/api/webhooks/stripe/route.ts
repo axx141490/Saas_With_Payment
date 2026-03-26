@@ -45,6 +45,29 @@ export async function POST(req: NextRequest) {
             ),
           },
         });
+      } else if (
+        session.mode === "payment" &&
+        session.metadata?.type === "recharge"
+      ) {
+        // Handle recharge payment
+        const amount = parseFloat(session.metadata.amount);
+        const transactionId = session.metadata.transactionId;
+
+        // Update user balance
+        await prisma.user.update({
+          where: { id: session.metadata.userId },
+          data: {
+            balance: {
+              increment: amount,
+            },
+          },
+        });
+
+        // Update transaction status
+        await prisma.transaction.update({
+          where: { id: transactionId },
+          data: { status: "completed" },
+        });
       }
       break;
     }

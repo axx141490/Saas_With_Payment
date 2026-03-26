@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 
@@ -14,10 +13,10 @@ interface MobileNavProps {
 export function MobileNav({ isSignedIn }: MobileNavProps) {
   return (
     <Sheet>
-      <SheetTrigger className="md:hidden">
-        <Button variant="ghost" size="icon" render={<span />}>
-          <Menu className="h-5 w-5" />
-        </Button>
+      <SheetTrigger
+        className={`md:hidden ${buttonVariants({ variant: "ghost", size: "icon" })}`}
+      >
+        <Menu className="h-5 w-5" />
       </SheetTrigger>
       <SheetContent side="right" className="w-[300px]">
         <nav className="flex flex-col space-y-4 mt-8">

@@ -2,7 +2,8 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getUserSubscription } from "@/lib/subscription";
 import { SubscriptionBadge } from "@/components/subscription-badge";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
+import { prisma } from "@/lib/db";
 import {
   Card,
   CardContent,
@@ -19,6 +20,12 @@ export default async function DashboardPage() {
   if (!userId) redirect("/sign-in");
 
   const subscription = await getUserSubscription();
+
+  // Get user balance
+  const user = await prisma.user.findUnique({
+    where: { clerkId: userId },
+  });
+  const balance = user?.balance ?? 0;
 
   const plan = subscription?.isEnterprise
     ? "enterprise"
@@ -58,7 +65,24 @@ export default async function DashboardPage() {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>账户余额</CardTitle>
+            <CardDescription>当前可用余额</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-4">
+              <p className="text-4xl font-bold text-primary">
+                ¥{balance.toFixed(2)}
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                可用于购买服务
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-3">
@@ -121,6 +145,14 @@ export default async function DashboardPage() {
             <CardDescription>管理你的账户</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
+            <Link
+              href="/dashboard/recharge"
+              className={buttonVariants({
+                className: "w-full",
+              })}
+            >
+              账户充值
+            </Link>
             {subscription?.isActive && <ManageSubscriptionButton />}
             <Link
               href="/pricing"

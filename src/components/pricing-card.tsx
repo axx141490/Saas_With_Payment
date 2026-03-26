@@ -31,12 +31,12 @@ export function PricingCard({
 }: PricingCardProps) {
   return (
     <Card
-      className={`relative flex flex-col ${
+      className={`relative flex flex-col overflow-visible ${
         popular ? "border-primary shadow-lg scale-105" : ""
       }`}
     >
       {popular && (
-        <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
+        <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-4 py-1 overflow-visible h-auto">
           最受欢迎
         </Badge>
       )}
