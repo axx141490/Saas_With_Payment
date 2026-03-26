@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -53,12 +53,15 @@ export default function Home() {
           助力你快速上线付费功能。
         </p>
         <div className="mt-10 flex flex-col sm:flex-row gap-4">
-          <Button size="lg" asChild>
-            <Link href="/sign-up">开始使用</Link>
-          </Button>
-          <Button size="lg" variant="outline" asChild>
-            <Link href="/pricing">查看定价</Link>
-          </Button>
+          <Link href="/sign-up" className={buttonVariants({ size: "lg" })}>
+            开始使用
+          </Link>
+          <Link
+            href="/pricing"
+            className={buttonVariants({ size: "lg", variant: "outline" })}
+          >
+            查看定价
+          </Link>
         </div>
       </section>
 
@@ -115,9 +118,12 @@ export default function Home() {
               </Card>
             ))}
           </div>
-          <Button className="mt-8" size="lg" asChild>
-            <Link href="/pricing">了解更多</Link>
-          </Button>
+          <Link
+            href="/pricing"
+            className={buttonVariants({ size: "lg", className: "mt-8" })}
+          >
+            了解更多
+          </Link>
         </div>
       </section>
 

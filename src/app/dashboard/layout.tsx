@@ -32,7 +32,7 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className="flex-1 flex flex-col">
         <header className="flex h-14 items-center justify-end border-b px-6">
-          <UserButton afterSignOutUrl="/" />
+          <UserButton />
         </header>
         <main className="flex-1 p-6">{children}</main>
       </div>

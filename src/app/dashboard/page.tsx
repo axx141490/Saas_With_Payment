@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getUserSubscription } from "@/lib/subscription";
 import { SubscriptionBadge } from "@/components/subscription-badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -51,9 +51,9 @@ export default async function DashboardPage() {
                 升级到 Pro 或 Enterprise 方案以解锁更多功能
               </p>
             </div>
-            <Button asChild>
-              <Link href="/pricing">升级方案</Link>
-            </Button>
+            <Link href="/pricing" className={buttonVariants()}>
+              升级方案
+            </Link>
           </CardContent>
         </Card>
       )}
@@ -122,11 +122,15 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {subscription?.isActive && <ManageSubscriptionButton />}
-            <Button variant="outline" className="w-full" asChild>
-              <Link href="/pricing">
-                {subscription?.isActive ? "更换方案" : "升级方案"}
-              </Link>
-            </Button>
+            <Link
+              href="/pricing"
+              className={buttonVariants({
+                variant: "outline",
+                className: "w-full",
+              })}
+            >
+              {subscription?.isActive ? "更换方案" : "升级方案"}
+            </Link>
           </CardContent>
         </Card>
       </div>

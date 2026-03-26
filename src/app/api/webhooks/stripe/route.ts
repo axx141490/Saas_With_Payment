@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
             status: subscription.status,
             paymentMethod: paymentMethodType,
             currentPeriodEnd: new Date(
-              subscription.current_period_end * 1000
+              subscription.items.data[0].current_period_end * 1000
             ),
           },
         });
@@ -51,16 +51,20 @@ export async function POST(req: NextRequest) {
 
     case "invoice.payment_succeeded": {
       const invoice = event.data.object as Stripe.Invoice;
-      if (invoice.subscription) {
-        const subscription = await stripe.subscriptions.retrieve(
-          invoice.subscription as string
-        );
+      const subscriptionId =
+        invoice.parent?.subscription_details?.subscription;
+      if (subscriptionId) {
+        const subId =
+          typeof subscriptionId === "string"
+            ? subscriptionId
+            : subscriptionId.id;
+        const subscription = await stripe.subscriptions.retrieve(subId);
         await prisma.subscription.update({
           where: { stripeSubscriptionId: subscription.id },
           data: {
             status: subscription.status,
             currentPeriodEnd: new Date(
-              subscription.current_period_end * 1000
+              subscription.items.data[0].current_period_end * 1000
             ),
           },
         });
@@ -76,7 +80,7 @@ export async function POST(req: NextRequest) {
           status: subscription.status,
           stripePriceId: subscription.items.data[0].price.id,
           currentPeriodEnd: new Date(
-            subscription.current_period_end * 1000
+            subscription.items.data[0].current_period_end * 1000
           ),
         },
       });
