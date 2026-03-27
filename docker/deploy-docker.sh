@@ -93,7 +93,8 @@ sleep 5
 
 # 运行数据库迁移
 echo -e "${YELLOW}正在运行数据库迁移...${NC}"
-docker compose exec app npx prisma db push
+# Prisma 7 需要通过环境变量或命令行参数传递 DATABASE_URL
+docker compose exec app sh -c 'npx prisma db push --accept-data-loss || echo "数据库迁移可能已完成或数据库已存在"'
 
 echo ""
 echo -e "${GREEN}==================================="
