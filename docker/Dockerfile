@@ -6,10 +6,11 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# 复制 package 文件
+# 复制 package 文件和 Prisma schema
 COPY package.json package-lock.json* ./
+COPY prisma ./prisma
 
-# 安装依赖
+# 安装依赖（会自动运行 prisma generate）
 RUN npm ci
 
 # 构建阶段
