@@ -73,7 +73,7 @@ echo ""
 
 # 构建镜像
 echo -e "${YELLOW}正在构建 Docker 镜像...${NC}"
-docker compose build
+docker compose --env-file ../.env.production build
 
 echo ""
 echo -e "${GREEN}✓ 镜像构建完成${NC}"
@@ -81,7 +81,7 @@ echo ""
 
 # 启动服务
 echo -e "${YELLOW}正在启动服务...${NC}"
-docker compose up -d
+docker compose --env-file ../.env.production up -d
 
 echo ""
 echo -e "${GREEN}✓ 服务已启动${NC}"
@@ -94,7 +94,7 @@ sleep 5
 # 运行数据库迁移
 echo -e "${YELLOW}正在运行数据库迁移...${NC}"
 # Prisma 7 需要通过环境变量或命令行参数传递 DATABASE_URL
-docker compose exec app sh -c 'npx prisma db push --accept-data-loss || echo "数据库迁移可能已完成或数据库已存在"'
+docker compose --env-file ../.env.production exec app sh -c 'npx prisma db push --accept-data-loss || echo "数据库迁移可能已完成或数据库已存在"'
 
 echo ""
 echo -e "${GREEN}==================================="
